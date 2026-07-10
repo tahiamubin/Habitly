@@ -8,6 +8,7 @@ import FAQ from "./components/FAQ";
 import Newsletter from "./components/Newsletter";
 import ProductivityTips from "./components/ProductivityTips";
 import TestimonialsSimple from "./components/Testimonials";
+import Hero from "./components/Hero";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Navbar></Navbar>
+        <Hero/>
         {children}
         <TestimonialsSimple/>
         <ProductivityTips/>
