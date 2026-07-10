@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  FaLightbulb, 
-  FaArrowRight, 
-  FaClock, 
+import {
+  FaLightbulb,
+  FaArrowRight,
+  FaClock,
   FaBrain,
   FaBolt,
   FaLeaf,
   FaStar,
-  FaFire
+  FaFire,
 } from "react-icons/fa";
-import { GiHabitUp } from "react-icons/gi";
 
 const ProductivityTips = () => {
   const tips = [
@@ -19,50 +18,56 @@ const ProductivityTips = () => {
       id: 1,
       icon: <FaClock className="w-5 h-5" />,
       title: "The 2-Minute Rule",
-      description: "If a task takes less than 2 minutes, do it immediately. This prevents small tasks from piling up.",
+      description:
+        "If a task takes less than 2 minutes, do it immediately. This prevents small tasks from piling up.",
       tag: "Quick Win",
-      tagColor: "#b6ffde"
+      tagColor: "#b6ffde",
     },
     {
       id: 2,
       icon: <FaBrain className="w-5 h-5" />,
       title: "Deep Work Blocks",
-      description: "Schedule 90-minute focus sessions with zero distractions. Your brain needs uninterrupted time to enter flow state.",
+      description:
+        "Schedule 90-minute focus sessions with zero distractions. Your brain needs uninterrupted time to enter flow state.",
       tag: "Focus",
-      tagColor: "#7283ff"
+      tagColor: "#7283ff",
     },
     {
       id: 3,
       icon: <FaBolt className="w-5 h-5" />,
       title: "Eat the Frog First",
-      description: "Tackle your most challenging task first thing in the morning when your willpower is at its peak.",
+      description:
+        "Tackle your most challenging task first thing in the morning when your willpower is at its peak.",
       tag: "Strategy",
-      tagColor: "#b6ffde"
+      tagColor: "#b6ffde",
     },
     {
       id: 4,
       icon: <FaLeaf className="w-5 h-5" />,
       title: "Pomodoro Technique",
-      description: "Work for 25 minutes, then take a 5-minute break. Repeat 4 times for optimal productivity.",
+      description:
+        "Work for 25 minutes, then take a 5-minute break. Repeat 4 times for optimal productivity.",
       tag: "Technique",
-      tagColor: "#7283ff"
+      tagColor: "#7283ff",
     },
     {
       id: 5,
       icon: <FaStar className="w-5 h-5" />,
       title: "Habit Stacking",
-      description: "Attach a new habit to an existing one. 'After I brush my teeth, I'll meditate for 2 minutes.'",
+      description:
+        "Attach a new habit to an existing one. 'After I brush my teeth, I'll meditate for 2 minutes.'",
       tag: "Habit Building",
-      tagColor: "#b6ffde"
+      tagColor: "#b6ffde",
     },
     {
       id: 6,
       icon: <FaFire className="w-5 h-5" />,
       title: "The 5-Second Rule",
-      description: "When you feel the urge to procrastinate, count 5-4-3-2-1 and take action immediately.",
+      description:
+        "When you feel the urge to procrastinate, count 5-4-3-2-1 and take action immediately.",
       tag: "Mindset",
-      tagColor: "#7283ff"
-    }
+      tagColor: "#7283ff",
+    },
   ];
 
   return (
@@ -70,15 +75,21 @@ const ProductivityTips = () => {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4" style={{ backgroundColor: "#b6ffde" }}>
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
+            style={{ backgroundColor: "#b6ffde" }}
+          >
             <FaLightbulb className="w-4 h-4 text-black" />
-            <span className="text-sm font-medium text-black">Productivity Tips</span>
+            <span className="text-sm font-medium text-black">
+              Productivity Tips
+            </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
             Master Your <span style={{ color: "#7283ff" }}>Productivity</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Proven strategies to help you build better habits, stay focused, and achieve more every day.
+            Proven strategies to help you build better habits, stay focused, and
+            achieve more every day.
           </p>
         </div>
 
@@ -91,7 +102,7 @@ const ProductivityTips = () => {
 
         {/* View All CTA */}
         <div className="text-center mt-12">
-          <Link 
+          <Link
             href="/explore"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 group"
             style={{ backgroundColor: "#7283ff", color: "white" }}
@@ -108,14 +119,14 @@ const ProductivityTips = () => {
 // Individual Tip Card Component
 const TipCard = ({ tip, index }: { tip: any; index: number }) => {
   return (
-    <div 
+    <div
       className="group relative p-6 rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
       style={{
         animationDelay: `${index * 0.05}s`,
       }}
     >
       {/* Icon */}
-      <div 
+      <div
         className="inline-flex p-3 rounded-xl mb-4 transition-all duration-300 group-hover:scale-110"
         style={{ backgroundColor: `${tip.tagColor}20`, color: "#7283ff" }}
       >
@@ -123,23 +134,22 @@ const TipCard = ({ tip, index }: { tip: any; index: number }) => {
       </div>
 
       {/* Tag */}
-      <span 
+      <span
         className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-3"
-        style={{ backgroundColor: `${tip.tagColor}20`, color: tip.tagColor === "#b6ffde" ? "#000" : "#fff" }}
+        style={{
+          backgroundColor: `${tip.tagColor}20`,
+          color: tip.tagColor === "#b6ffde" ? "#000" : "#fff",
+        }}
       >
         {tip.tag}
       </span>
 
       {/* Content */}
-      <h3 className="text-lg font-bold text-black mb-2">
-        {tip.title}
-      </h3>
-      <p className="text-gray-600 text-sm leading-relaxed">
-        {tip.description}
-      </p>
+      <h3 className="text-lg font-bold text-black mb-2">{tip.title}</h3>
+      <p className="text-gray-600 text-sm leading-relaxed">{tip.description}</p>
 
       {/* Learn More Link */}
-      <Link 
+      <Link
         href={`/explore?tip=${tip.id}`}
         className="inline-flex items-center gap-1 text-sm font-medium mt-4 transition-all duration-300 hover:gap-2"
         style={{ color: "#7283ff" }}
@@ -150,7 +160,7 @@ const TipCard = ({ tip, index }: { tip: any; index: number }) => {
 
       {/* Decorative Number */}
       <div className="absolute top-4 right-4 text-4xl font-bold opacity-5 text-black">
-        {String(tip.id).padStart(2, '0')}
+        {String(tip.id).padStart(2, "0")}
       </div>
     </div>
   );

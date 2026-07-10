@@ -7,6 +7,7 @@ import CTASection from "./components/CTASection";
 import FAQ from "./components/FAQ";
 import Newsletter from "./components/Newsletter";
 import ProductivityTips from "./components/ProductivityTips";
+import TestimonialsSimple from "./components/Testimonials";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Navbar></Navbar>
         {children}
+        <TestimonialsSimple/>
         <ProductivityTips/>
         <Newsletter/>
         <FAQ/>
