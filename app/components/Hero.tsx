@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaArrowRight, FaPlay, FaStar, FaUsers, FaCheckCircle, FaSnowman } from "react-icons/fa";
+import { FaArrowRight, FaPlay, FaStar, FaCheckCircle, FaSnowman, FaUsers } from "react-icons/fa";
 
 
 const Hero = () => {
