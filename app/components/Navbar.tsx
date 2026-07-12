@@ -3,8 +3,12 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { authClient } from "../lib/auth-client";
 
 export default function Navbar() {
+  // const {data: session} = authClient.useSession()
+  // const user = session?.user 
+  // console.log(user)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -123,7 +127,7 @@ function NavLinks({ isLoggedIn, onLogout }: { isLoggedIn: boolean; onLogout: () 
         <>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link 
-              href="/habits/add" 
+              href="/habits" 
               className="px-4 py-2 rounded-full font-medium transition-all duration-300 shadow-sm hover:shadow-md"
               style={{ backgroundColor: "#7283ff", color: "white" }}
             >
@@ -199,7 +203,7 @@ function MobileNavLinks({
             }}
           >
             <Link 
-              href="/habits/add" 
+              href="/habits" 
               className="block w-full text-center px-4 py-3 rounded-full font-medium transition-all duration-300"
               style={{ backgroundColor: "#7283ff", color: "white" }}
               onClick={closeMenu}

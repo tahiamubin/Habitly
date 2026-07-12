@@ -10,13 +10,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem("habitly_auth", "true");
-    localStorage.setItem("habitly_user", JSON.stringify({ email }));
-    router.push("/");
-    router.refresh();
-  };
+  // const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const formData = new FormData(e.currentTarget)
+  //   const user = Object.fromEntries(formData.entries())
+  //   console.log(user)
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
