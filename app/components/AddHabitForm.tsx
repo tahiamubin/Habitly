@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { creteHabit } from "../lib/actions/habits";
+import toast from "react-hot-toast";
 
 interface HabitFormData {
   name: string;
@@ -19,7 +21,7 @@ const AddHabitForm = () => {
     description: "",
     frequency: "daily",
     target: "",
-    category: ""
+    category: "",
   });
 
   const categories = [
@@ -30,37 +32,53 @@ const AddHabitForm = () => {
     "Learning",
     "Finance",
     "Relationships",
-    "Other"
+    "Other",
   ];
 
   const frequencies = [
     { value: "daily", label: "Daily" },
     { value: "weekly", label: "Weekly" },
-    { value: "monthly", label: "Monthly" }
+    { value: "monthly", label: "Monthly" },
   ];
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  interface Habit {
+    category: string;
+    description: string;
+    name: string;
+    target: string;
+  }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget)
-    const habit = Object.fromEntries(formData.entries())
-    console.log(habit)
-
+    const formData = new FormData(e.currentTarget);
+    const habit: Habit = {
+      category: formData.get("category") as string,
+      description: formData.get("description") as string,
+      name: formData.get("name") as string,
+      target: formData.get("target") as string,
+    };
+    await creteHabit(habit);
+    toast.success("Posted")
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Habit Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Habit Name *
         </label>
         <input
@@ -77,7 +95,10 @@ const AddHabitForm = () => {
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Description
         </label>
         <textarea
@@ -93,7 +114,10 @@ const AddHabitForm = () => {
 
       {/* Category */}
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="category"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Category *
         </label>
         <select
@@ -115,7 +139,10 @@ const AddHabitForm = () => {
 
       {/* Frequency */}
       <div>
-        <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="frequency"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Frequency *
         </label>
         <div className="grid grid-cols-3 gap-3">
@@ -123,14 +150,20 @@ const AddHabitForm = () => {
             <button
               key={freq.value}
               type="button"
-              onClick={() => setFormData((prev) => ({ ...prev, frequency: freq.value as any }))}
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  frequency: freq.value as any,
+                }))
+              }
               className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 formData.frequency === freq.value
                   ? "text-white shadow-sm"
                   : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
               }`}
               style={{
-                backgroundColor: formData.frequency === freq.value ? "#7283ff" : "transparent"
+                backgroundColor:
+                  formData.frequency === freq.value ? "#7283ff" : "transparent",
               }}
             >
               {freq.label}
@@ -141,7 +174,10 @@ const AddHabitForm = () => {
 
       {/* Target */}
       <div>
-        <label htmlFor="target" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="target"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Target
         </label>
         <input
