@@ -16,7 +16,7 @@ export const creteHabit = async (data: Habit): Promise<HabitResponse> => {
   const res = await fetch(`${baseUrl}/habit`, {
     method: "POST",
     headers: {
-      "content-type": "application-json",
+      "content-type": "application/json",
     },
     body: JSON.stringify(data),
   });

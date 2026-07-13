@@ -54,6 +54,7 @@ const AddHabitForm = () => {
     description: string;
     name: string;
     target: string;
+    frequency: string;
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -66,9 +67,19 @@ const AddHabitForm = () => {
       description: formData.get("description") as string,
       name: formData.get("name") as string,
       target: formData.get("target") as string,
+      frequency: formData.get("frequency") as string
     };
-    await creteHabit(habit);
-    toast.success("Posted")
+
+    try {
+      await creteHabit(habit);
+      toast.success("Posted");
+      router.push("/habits"); // or wherever, optional
+    } catch (error) {
+      toast.error("Failed to create habit");
+      console.error(error);
+    } finally {
+      setIsLoading(false); // always reset, success or fail
+    }
   };
 
   return (
@@ -145,6 +156,7 @@ const AddHabitForm = () => {
         >
           Frequency *
         </label>
+        <input type="hidden" name="frequency" value={formData.frequency} />
         <div className="grid grid-cols-3 gap-3">
           {frequencies.map((freq) => (
             <button

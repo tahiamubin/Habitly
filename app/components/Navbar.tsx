@@ -211,7 +211,7 @@ function MobileNavLinks({
               + Add Habit
             </Link>
           </motion.div>
-          <MobileNavLink href="/habits" onClick={closeMenu}>My Habits</MobileNavLink>
+          <MobileNavLink href="/my-habits" onClick={closeMenu}>My Habits</MobileNavLink>
           <MobileNavLink href="/saved-guides" onClick={closeMenu}>Saved Guides</MobileNavLink>
           <MobileNavLink href="/about" onClick={closeMenu}>About</MobileNavLink>
           <motion.button

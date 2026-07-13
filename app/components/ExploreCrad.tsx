@@ -49,7 +49,7 @@ const ExploreCard = ({ guide }: ExploreCardProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Link href={`/guides/${guide.id}`}>
+      <Link href={`/explore/${guide.id}`}>
         <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-gray-100 hover:border-[#7283ff]/20 hover:-translate-y-1">
           {/* Image */}
           <div className="relative h-48 overflow-hidden">
