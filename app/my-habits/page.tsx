@@ -42,7 +42,7 @@ const Page = async () => {
             </a>
           </div>
         ) : (
-          <HabitsList habits={habits} />
+          <HabitsList   habits={habits} />
         )}
       </div>
     </div>

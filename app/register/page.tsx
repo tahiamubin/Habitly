@@ -31,11 +31,11 @@ export default function RegisterPage() {
     redirect("/");
   };
 
-  // const handleGoogleSignUp = async (): Promise<void> => {
-  //   await authClient.signIn.social({
-  //     provider: "google",
-  //   });
-  // };
+  const handleGoogleSignUp = async (): Promise<void> => {
+    await authClient.signIn.social({
+      provider: "google",
+    });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -138,7 +138,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Google Sign Up - At the end */}
-        {/* <button
+        <button
           onClick={handleGoogleSignUp}
           disabled={isLoading}
           className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg border-2 border-gray-200 hover:border-[#7283ff] hover:bg-gray-50 transition-all duration-200"
@@ -164,7 +164,7 @@ export default function RegisterPage() {
           <span className="font-medium text-gray-700">
             {isLoading ? "Signing up..." : "Sign up with Google"}
           </span>
-        </button> */}
+        </button>
 
         {/* Login Link */}
         <p className="text-center mt-6 text-sm text-gray-600">

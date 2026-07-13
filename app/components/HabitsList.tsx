@@ -13,9 +13,11 @@ import {
   FaClock,
   FaPlus
 } from "react-icons/fa";
+import { deleteHabit } from "../lib/actions/habits";
+import toast from "react-hot-toast";
 
 interface Habit {
-  id: string;
+  _id: object;
   name: string;
   description?: string;
   frequency: "daily" | "weekly" | "monthly";
@@ -41,8 +43,10 @@ const HabitsList = ({ habits }: HabitsListProps) => {
     setSelectedHabit(habit);
   };
 
-  const handleDelete = (id: string) => {
-    setDeleteId(id);
+  const handleDelete = async(id: string) => {
+    
+   await deleteHabit(id)
+   toast.success("Deleted")
   };
 
   const confirmDelete = () => {
@@ -118,7 +122,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
             </thead>
             <tbody>
               {habits.map((habit) => (
-                <tr key={habit.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <tr key={habit._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-medium text-black">{habit.name}</p>
@@ -179,7 +183,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                         <FaEye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(habit.id)}
+                        onClick={() => handleDelete(habit._id)}
                         className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                         title="Delete"
                       >
@@ -197,7 +201,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {habits.map((habit) => (
-          <div key={habit.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          <div key={habit._id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
                 <h3 className="font-bold text-black">{habit.name}</h3>
@@ -253,7 +257,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                   <FaEye className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDelete(habit.id)}
+                  onClick={() => handleDelete(habit._id)}
                   className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                 >
                   <FaTrash className="w-4 h-4" />
