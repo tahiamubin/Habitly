@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { authClient } from "../lib/auth-client";
 
 type NavItem = { href: string; label: string };
 
@@ -19,14 +19,12 @@ const GUEST_LINKS: NavItem[] = [{ href: "/login", label: "Login" }];
 const AUTH_LINKS: NavItem[] = [{ href: "/habits", label: "My Habits" }];
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+  const isLoggedIn = !!user;
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const authStatus = localStorage.getItem("habitly_auth");
-    setIsLoggedIn(authStatus === "true");
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -34,10 +32,8 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("habitly_auth");
-    setIsLoggedIn(false);
-    setIsMenuOpen(false);
+  const handleLogout = async () => {
+    await authClient.signOut();
   };
 
   const links = [...PUBLIC_LINKS, ...(isLoggedIn ? AUTH_LINKS : GUEST_LINKS)];
@@ -55,7 +51,11 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center"
+            >
               <span className="text-2xl font-extrabold tracking-tight text-black">
                 Habit
                 <span className="relative">
@@ -73,34 +73,36 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop: horizontal row, hidden on mobile */}
-          <div className="hidden md:flex items-center space-x-1">
-            {links.map((link) => (
-              <NavLinkDesktop key={link.href} href={link.href}>
-                {link.label}
-              </NavLinkDesktop>
-            ))}
+          {!isPending && (
+            <div className="hidden md:flex items-center space-x-1">
+              {links.map((link) => (
+                <NavLinkDesktop key={link.href} href={link.href}>
+                  {link.label}
+                </NavLinkDesktop>
+              ))}
 
-            {isLoggedIn ? (
-              <>
-                <ActionButton href="/habits/new" bg="#7283ff" color="white">
-                  + Add Habit
+              {isLoggedIn ? (
+                <>
+                  <ActionButton href="/habits/new" bg="#7283ff" color="white">
+                    + Add Habit
+                  </ActionButton>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleLogout}
+                    className="px-4 py-2 rounded-full font-medium transition-all duration-300 shadow-sm hover:shadow-md"
+                    style={{ backgroundColor: "#b6ffde", color: "black" }}
+                  >
+                    Logout
+                  </motion.button>
+                </>
+              ) : (
+                <ActionButton href="/register" bg="#b6ffde" color="black">
+                  Register
                 </ActionButton>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleLogout}
-                  className="px-4 py-2 rounded-full font-medium transition-all duration-300 shadow-sm hover:shadow-md"
-                  style={{ backgroundColor: "#b6ffde", color: "black" }}
-                >
-                  Logout
-                </motion.button>
-              </>
-            ) : (
-              <ActionButton href="/register" bg="#b6ffde" color="black">
-                Register
-              </ActionButton>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Mobile menu toggle */}
           <motion.button
@@ -108,11 +110,26 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden text-black focus:outline-none p-2 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </svg>
           </motion.button>
@@ -131,26 +148,42 @@ export default function Navbar() {
               <motion.div
                 className="flex flex-col space-y-2 py-4"
                 variants={{
-                  open: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
-                  closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
+                  open: {
+                    transition: { staggerChildren: 0.07, delayChildren: 0.05 },
+                  },
+                  closed: {
+                    transition: { staggerChildren: 0.05, staggerDirection: -1 },
+                  },
                 }}
                 initial="closed"
                 animate="open"
                 exit="closed"
               >
                 {links.map((link) => (
-                  <NavLinkMobile key={link.href} href={link.href} onClick={() => setIsMenuOpen(false)}>
+                  <NavLinkMobile
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     {link.label}
                   </NavLinkMobile>
                 ))}
 
                 {isLoggedIn ? (
                   <>
-                    <MobileActionButton href="/habits/new" bg="#7283ff" color="white" onClick={() => setIsMenuOpen(false)}>
+                    <MobileActionButton
+                      href="/habits/new"
+                      bg="#7283ff"
+                      color="white"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       + Add Habit
                     </MobileActionButton>
                     <motion.button
-                      variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}
+                      variants={{
+                        open: { opacity: 1, x: 0 },
+                        closed: { opacity: 0, x: -20 },
+                      }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleLogout}
                       className="w-full px-4 py-3 rounded-full font-medium transition-all duration-300"
@@ -160,7 +193,12 @@ export default function Navbar() {
                     </motion.button>
                   </>
                 ) : (
-                  <MobileActionButton href="/register" bg="#b6ffde" color="black" onClick={() => setIsMenuOpen(false)}>
+                  <MobileActionButton
+                    href="/register"
+                    bg="#b6ffde"
+                    color="black"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     Register
                   </MobileActionButton>
                 )}
@@ -173,10 +211,23 @@ export default function Navbar() {
   );
 }
 
-function NavLinkDesktop({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLinkDesktop({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
-    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="relative">
-      <Link href={href} className="px-3 py-2 rounded-lg text-black font-medium transition-colors hover:bg-gray-50">
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="relative"
+    >
+      <Link
+        href={href}
+        className="px-3 py-2 rounded-lg text-black font-medium transition-colors hover:bg-gray-50"
+      >
         {children}
       </Link>
       <motion.div
@@ -199,7 +250,9 @@ function NavLinkMobile({
   onClick: () => void;
 }) {
   return (
-    <motion.div variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}>
+    <motion.div
+      variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}
+    >
       <Link
         href={href}
         onClick={onClick}
@@ -249,7 +302,9 @@ function MobileActionButton({
   children: React.ReactNode;
 }) {
   return (
-    <motion.div variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}>
+    <motion.div
+      variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}
+    >
       <Link
         href={href}
         onClick={onClick}
