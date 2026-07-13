@@ -16,7 +16,7 @@ const PUBLIC_LINKS: NavItem[] = [
 
 const GUEST_LINKS: NavItem[] = [{ href: "/login", label: "Login" }];
 
-const AUTH_LINKS: NavItem[] = [{ href: "/habits", label: "My Habits" }];
+const AUTH_LINKS: NavItem[] = [{ href: "/my-habits", label: "My Habits" }];
 
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();

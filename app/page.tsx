@@ -6,6 +6,8 @@ import ProductivityTips from "./components/ProductivityTips";
 import TestimonialsSimple from "./components/Testimonials";
 import { guides } from "@/data/guides";
 import ExploreCard from "./components/ExploreCrad";
+import CTASection from "./components/CTASection";
+import Highlights from "./components/Highlights";
 
 export default function Home() {
   return (
@@ -25,6 +27,7 @@ export default function Home() {
       <TestimonialsSimple />
       <ProductivityTips />
       <Newsletter />
+      <Highlights/>
       <FAQ />
     </div>
   );
