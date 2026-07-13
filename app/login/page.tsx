@@ -2,19 +2,41 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import { authClient } from "../lib/auth-client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget)
-    const user = Object.fromEntries(formData.entries())
-    console.log(user)
+    const formData = new FormData(e.currentTarget);
+    const user = Object.fromEntries(formData.entries()) as {
+      email: string;
+      password: string;
+    };
+
+    setIsLoading(true);
+
+    const { data, error } = await authClient.signIn.email({
+      email: user.email,
+      password: user.password,
+    });
+
+    setIsLoading(false);
+
+    if (data) {
+      redirect("/");
+    }
+    if (error) {
+      toast.error("Sign in not successful");
+    }
   };
 
   return (
@@ -37,7 +59,7 @@ export default function LoginPage() {
             Login to continue building habits
           </p>
         </motion.div>
-        
+
         <form onSubmit={handleLogin} className="space-y-6">
           <motion.div
             initial={{ x: -20, opacity: 0 }}
@@ -49,18 +71,18 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 transition-all"
-              style={{ 
-                focusRingColor: "#7283ff",
-                borderColor: "#e5e7eb"
+              style={{
+                borderColor: "#e5e7eb",
               }}
               placeholder="you@example.com"
               required
             />
           </motion.div>
-          
+
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -71,12 +93,12 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 transition-all"
-              style={{ 
-                focusRingColor: "#7283ff",
-                borderColor: "#e5e7eb"
+              style={{
+                borderColor: "#e5e7eb",
               }}
               placeholder="••••••••"
               required
@@ -87,10 +109,11 @@ export default function LoginPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full py-3 rounded-xl font-medium transition-all duration-300 shadow-sm hover:shadow-md"
+            disabled={isLoading}
+            className="w-full py-3 rounded-xl font-medium transition-all duration-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: "#7283ff", color: "white" }}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </motion.button>
         </form>
 
@@ -101,7 +124,11 @@ export default function LoginPage() {
           className="text-center mt-6 text-gray-600"
         >
           Don't have an account?{" "}
-          <Link href="/register" style={{ color: "#7283ff" }} className="font-medium hover:underline">
+          <Link
+            href="/register"
+            style={{ color: "#7283ff" }}
+            className="font-medium hover:underline"
+          >
             Register
           </Link>
         </motion.p>

@@ -3,190 +3,122 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FaHome, 
-  FaCompass, 
-  FaUser, 
-  FaSignOutAlt,
-  FaPlus,
-  FaBars,
-  FaTimes,
-  FaBookmark,
-  FaInfoCircle,
-  FaShieldAlt,
-  FaUserPlus,
-  FaSignInAlt,
-  FaSnowman
-} from "react-icons/fa";
 
+
+type NavItem = { href: string; label: string };
+
+const PUBLIC_LINKS: NavItem[] = [
+  { href: "/", label: "Home" },
+  { href: "/explore", label: "Explore" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/about", label: "About" },
+];
+
+const GUEST_LINKS: NavItem[] = [{ href: "/login", label: "Login" }];
+
+const AUTH_LINKS: NavItem[] = [{ href: "/habits", label: "My Habits" }];
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<{ name?: string; email?: string; avatar?: string } | null>(null);
 
   useEffect(() => {
     const authStatus = localStorage.getItem("habitly_auth");
     setIsLoggedIn(authStatus === "true");
-    
-    const userData = localStorage.getItem("habitly_user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("habitly_auth");
-    localStorage.removeItem("habitly_user");
     setIsLoggedIn(false);
-    setUser(null);
     setIsMenuOpen(false);
-    window.location.href = "/";
   };
 
-  const navLinks = [
-    { href: "/", label: "Home", icon: FaHome },
-    { href: "/explore", label: "Explore", icon: FaCompass },
-    { href: "/about", label: "About", icon: FaInfoCircle },
-  ];
-
-  const loggedInLinks = [
-    { href: "/habits", label: "My Habits", icon: FaBookmark },
-  ];
+  const links = [...PUBLIC_LINKS, ...(isLoggedIn ? AUTH_LINKS : GUEST_LINKS)];
 
   return (
-    <nav 
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
       className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? "bg-white/95 backdrop-blur-lg shadow-lg" 
-          : "bg-white"
+        scrolled ? "bg-white/90 backdrop-blur-lg shadow-lg" : "bg-white"
       } border-b border-gray-100`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Link href="/" className="flex items-center gap-2 group">
-              <div 
-                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                style={{ backgroundColor: "#b6ffde" }}
-              >
-                <FaSnowman className="w-5 h-5 text-black" />
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                <span className="text-black">Habit</span>
-                <span style={{ color: "#7283ff" }}>ly</span>
+          <Link href="/" className="flex items-center space-x-2 group">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center">
+              <span className="text-2xl font-extrabold tracking-tight text-black">
+                Habit
+                <span className="relative">
+                  ly
+                  <motion.span
+                    className="absolute -bottom-1 left-0 w-full h-0.5"
+                    style={{ backgroundColor: "#7283ff" }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.3 }}
+                  />
+                </span>
               </span>
-            </Link>
-          </motion.div>
+            </motion.div>
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <NavLink key={link.href} href={link.href} icon={link.icon}>
+          {/* Desktop: horizontal row, hidden on mobile */}
+          <div className="hidden md:flex items-center space-x-1">
+            {links.map((link) => (
+              <NavLinkDesktop key={link.href} href={link.href}>
                 {link.label}
-              </NavLink>
-            ))}
-
-            {isLoggedIn && loggedInLinks.map((link) => (
-              <NavLink key={link.href} href={link.href} icon={link.icon}>
-                {link.label}
-              </NavLink>
+              </NavLinkDesktop>
             ))}
 
             {isLoggedIn ? (
-              <div className="flex items-center gap-3 ml-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="/habits/add"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#7283ff]/30"
-                    style={{ backgroundColor: "#7283ff" }}
-                  >
-                    <FaPlus className="w-4 h-4" />
-                    Add Habit
-                  </Link>
-                </motion.div>
-
-                <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-                  {/* User Avatar */}
-                  <div className="flex items-center gap-2">
-                    <img 
-                      src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=7283ff&color=fff&size=32`}
-                      alt={user?.name || "User"}
-                      className="w-8 h-8 rounded-full ring-2 ring-[#7283ff]/20"
-                    />
-                    {user?.name && (
-                      <span className="text-sm font-medium text-gray-700 hidden lg:block">
-                        {user.name.split(' ')[0]}
-                      </span>
-                    )}
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
-                  >
-                    <FaSignOutAlt className="w-4 h-4" />
-                    <span className="hidden lg:inline">Logout</span>
-                  </motion.button>
-                </div>
-              </div>
+              <>
+                <ActionButton href="/habits/new" bg="#7283ff" color="white">
+                  + Add Habit
+                </ActionButton>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleLogout}
+                  className="px-4 py-2 rounded-full font-medium transition-all duration-300 shadow-sm hover:shadow-md"
+                  style={{ backgroundColor: "#b6ffde", color: "black" }}
+                >
+                  Logout
+                </motion.button>
+              </>
             ) : (
-              <div className="flex items-center gap-3 ml-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="/login"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-gray-600 hover:text-[#7283ff] transition-all duration-200"
-                  >
-                    <FaSignInAlt className="w-4 h-4" />
-                    Login
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="/register"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#7283ff]/30"
-                    style={{ backgroundColor: "#7283ff" }}
-                  >
-                    <FaUserPlus className="w-4 h-4" />
-                    Register
-                  </Link>
-                </motion.div>
-              </div>
+              <ActionButton href="/register" bg="#b6ffde" color="black">
+                Register
+              </ActionButton>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile menu toggle */}
           <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden text-black focus:outline-none p-2 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            {isMenuOpen ? (
-              <FaTimes className="w-6 h-6 text-gray-600" />
-            ) : (
-              <FaBars className="w-6 h-6 text-gray-600" />
-            )}
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
           </motion.button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile: collapsible dropdown, same `links` array */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -196,142 +128,136 @@ export default function Navbar() {
               transition={{ duration: 0.3 }}
               className="md:hidden overflow-hidden border-t border-gray-100"
             >
-              <div className="py-4 space-y-1">
-                {/* User Info (if logged in) */}
-                {isLoggedIn && user && (
-                  <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-gray-50 rounded-xl">
-                    <img 
-                      src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=7283ff&color=fff&size=40`}
-                      alt={user?.name || "User"}
-                      className="w-10 h-10 rounded-full ring-2 ring-[#7283ff]/20"
-                    />
-                    <div>
-                      <p className="font-medium text-black">{user?.name || "User"}</p>
-                      <p className="text-xs text-gray-500">{user?.email || "user@email.com"}</p>
-                    </div>
-                  </div>
+              <motion.div
+                className="flex flex-col space-y-2 py-4"
+                variants={{
+                  open: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+                  closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
+                }}
+                initial="closed"
+                animate="open"
+                exit="closed"
+              >
+                {links.map((link) => (
+                  <NavLinkMobile key={link.href} href={link.href} onClick={() => setIsMenuOpen(false)}>
+                    {link.label}
+                  </NavLinkMobile>
+                ))}
+
+                {isLoggedIn ? (
+                  <>
+                    <MobileActionButton href="/habits/new" bg="#7283ff" color="white" onClick={() => setIsMenuOpen(false)}>
+                      + Add Habit
+                    </MobileActionButton>
+                    <motion.button
+                      variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleLogout}
+                      className="w-full px-4 py-3 rounded-full font-medium transition-all duration-300"
+                      style={{ backgroundColor: "#b6ffde", color: "black" }}
+                    >
+                      Logout
+                    </motion.button>
+                  </>
+                ) : (
+                  <MobileActionButton href="/register" bg="#b6ffde" color="black" onClick={() => setIsMenuOpen(false)}>
+                    Register
+                  </MobileActionButton>
                 )}
-
-                {navLinks.map((link) => (
-                  <MobileNavLink 
-                    key={link.href} 
-                    href={link.href} 
-                    icon={link.icon}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </MobileNavLink>
-                ))}
-
-                {isLoggedIn && loggedInLinks.map((link) => (
-                  <MobileNavLink 
-                    key={link.href} 
-                    href={link.href} 
-                    icon={link.icon}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </MobileNavLink>
-                ))}
-
-                <div className="border-t border-gray-100 my-2 pt-2">
-                  {isLoggedIn ? (
-                    <>
-                      <MobileNavLink 
-                        href="/habits/add" 
-                        icon={FaPlus}
-                        onClick={() => setIsMenuOpen(false)}
-                        highlight
-                      >
-                        Add Habit
-                      </MobileNavLink>
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200"
-                      >
-                        <FaSignOutAlt className="w-5 h-5" />
-                        <span className="font-medium">Logout</span>
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <MobileNavLink 
-                        href="/login" 
-                        icon={FaSignInAlt}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Login
-                      </MobileNavLink>
-                      <MobileNavLink 
-                        href="/register" 
-                        icon={FaUserPlus}
-                        onClick={() => setIsMenuOpen(false)}
-                        highlight
-                      >
-                        Register
-                      </MobileNavLink>
-                    </>
-                  )}
-                </div>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 }
 
-// Desktop Nav Link Component
-const NavLink = ({ 
-  href, 
-  children, 
-  icon: Icon 
-}: { 
-  href: string; 
-  children: React.ReactNode; 
-  icon: React.ElementType;
-}) => {
+function NavLinkDesktop({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-      <Link 
-        href={href} 
-        className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-200"
+    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="relative">
+      <Link href={href} className="px-3 py-2 rounded-lg text-black font-medium transition-colors hover:bg-gray-50">
+        {children}
+      </Link>
+      <motion.div
+        className="absolute -bottom-1 left-1/2 w-0 h-0.5"
+        style={{ backgroundColor: "#7283ff" }}
+        whileHover={{ width: "80%", left: "10%" }}
+        transition={{ duration: 0.2 }}
+      />
+    </motion.div>
+  );
+}
+
+function NavLinkMobile({
+  href,
+  children,
+  onClick,
+}: {
+  href: string;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <motion.div variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}>
+      <Link
+        href={href}
+        onClick={onClick}
+        className="block px-4 py-3 rounded-lg text-black font-medium hover:bg-gray-50 transition-colors"
       >
-        <Icon className="w-4 h-4" />
         {children}
       </Link>
     </motion.div>
   );
-};
+}
 
-// Mobile Nav Link Component
-const MobileNavLink = ({ 
-  href, 
-  children, 
-  icon: Icon,
-  onClick,
-  highlight = false
-}: { 
-  href: string; 
-  children: React.ReactNode; 
-  icon: React.ElementType;
-  onClick: () => void;
-  highlight?: boolean;
-}) => {
+function ActionButton({
+  href,
+  bg,
+  color,
+  children,
+}: {
+  href: string;
+  bg: string;
+  color: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link 
-      href={href} 
-      onClick={onClick}
-      className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 ${
-        highlight 
-          ? "text-white" 
-          : "text-gray-600 hover:text-black hover:bg-gray-50"
-      }`}
-      style={highlight ? { backgroundColor: "#7283ff" } : {}}
-    >
-      <Icon className={`w-5 h-5 ${highlight ? "text-white" : "text-gray-400"}`} />
-      <span className="font-medium">{children}</span>
-    </Link>
+    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <Link
+        href={href}
+        className="px-4 py-2 rounded-full font-medium transition-all duration-300 shadow-sm hover:shadow-md inline-block"
+        style={{ backgroundColor: bg, color }}
+      >
+        {children}
+      </Link>
+    </motion.div>
   );
-};
+}
+
+function MobileActionButton({
+  href,
+  bg,
+  color,
+  onClick,
+  children,
+}: {
+  href: string;
+  bg: string;
+  color: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.div variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: -20 } }}>
+      <Link
+        href={href}
+        onClick={onClick}
+        className="block w-full text-center px-4 py-3 rounded-full font-medium transition-all duration-300"
+        style={{ backgroundColor: bg, color }}
+      >
+        {children}
+      </Link>
+    </motion.div>
+  );
+}

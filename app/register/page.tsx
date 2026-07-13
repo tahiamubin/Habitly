@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { authClient } from "../lib/auth-client";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -13,45 +14,28 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      alert("Passwords don't match!");
-      return;
-    }
+    const formData = new FormData(e.currentTarget);
+    const user = Object.fromEntries(formData.entries()) as {
+      name: string;
+      email: string;
+      password: string;
+    };
+    console.log(user)
 
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      localStorage.setItem("habitly_auth", "true");
-      localStorage.setItem("habitly_user", JSON.stringify({ 
-        name, 
-        email,
-        provider: "email"
-      }));
-      setIsLoading(false);
-      router.push("/");
-      router.refresh();
-    }, 1000);
+    await authClient.signUp.email({
+      ...user,
+    });
+
+    redirect("/");
   };
 
-  const handleGoogleSignUp = () => {
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      localStorage.setItem("habitly_auth", "true");
-      localStorage.setItem("habitly_user", JSON.stringify({ 
-        name: "Google User",
-        email: "user@gmail.com",
-        provider: "google",
-        avatar: "https://ui-avatars.com/api/?name=Google+User&background=7283ff&color=fff"
-      }));
-      setIsLoading(false);
-      router.push("/");
-      router.refresh();
-    }, 1500);
-  };
+  // const handleGoogleSignUp = async (): Promise<void> => {
+  //   await authClient.signIn.social({
+  //     provider: "google",
+  //   });
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -63,9 +47,7 @@ export default function RegisterPage() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-black">
-            Create Account
-          </h2>
+          <h2 className="text-3xl font-bold text-black">Create Account</h2>
           <p className="mt-2 text-gray-600">
             Start building better habits today
           </p>
@@ -80,13 +62,14 @@ export default function RegisterPage() {
             <input
               type="text"
               value={name}
+              name="name"
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7283ff] focus:border-transparent transition-all"
               placeholder="John Doe"
               required
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Email Address
@@ -94,13 +77,14 @@ export default function RegisterPage() {
             <input
               type="email"
               value={email}
+              name="email"
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7283ff] focus:border-transparent transition-all"
               placeholder="you@example.com"
               required
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Password
@@ -108,6 +92,7 @@ export default function RegisterPage() {
             <input
               type="password"
               value={password}
+              name="password"
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7283ff] focus:border-transparent transition-all"
               placeholder="Minimum 6 characters"
@@ -146,12 +131,14 @@ export default function RegisterPage() {
             <div className="w-full border-t border-gray-200"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500">Or continue with</span>
+            <span className="px-4 bg-white text-gray-500">
+              Or continue with
+            </span>
           </div>
         </div>
 
         {/* Google Sign Up - At the end */}
-        <button
+        {/* <button
           onClick={handleGoogleSignUp}
           disabled={isLoading}
           className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg border-2 border-gray-200 hover:border-[#7283ff] hover:bg-gray-50 transition-all duration-200"
@@ -177,12 +164,16 @@ export default function RegisterPage() {
           <span className="font-medium text-gray-700">
             {isLoading ? "Signing up..." : "Sign up with Google"}
           </span>
-        </button>
+        </button> */}
 
         {/* Login Link */}
         <p className="text-center mt-6 text-sm text-gray-600">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium hover:underline" style={{ color: "#7283ff" }}>
+          <Link
+            href="/login"
+            className="font-medium hover:underline"
+            style={{ color: "#7283ff" }}
+          >
             Log in
           </Link>
         </p>
