@@ -1,3 +1,4 @@
+import HabitsFrequencyChart from "../components/HabitsFrequencyChart";
 import HabitsList from "../components/HabitsList";
 import { getHabit } from "../lib/api/habit";
 
@@ -7,6 +8,7 @@ const Page = async () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+     
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
@@ -26,6 +28,7 @@ const Page = async () => {
               + Add New Habit
             </a>
           </div>
+          
         </div>
 
         {habits.length === 0 ? (
@@ -34,7 +37,7 @@ const Page = async () => {
             <h3 className="text-xl font-semibold text-black mb-2">No habits yet</h3>
             <p className="text-gray-600 mb-6">Start building your first habit today</p>
             <a
-              href="/habits/add"
+              href="/habits"
               className="inline-flex items-center px-6 py-2.5 rounded-lg font-medium text-white transition-all hover:opacity-90"
               style={{ backgroundColor: "#7283ff" }}
             >
@@ -42,9 +45,12 @@ const Page = async () => {
             </a>
           </div>
         ) : (
+          
           <HabitsList   habits={habits} />
+        
         )}
       </div>
+       <HabitsFrequencyChart  habits={habits}></HabitsFrequencyChart>
     </div>
   );
 };

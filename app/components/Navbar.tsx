@@ -83,7 +83,7 @@ export default function Navbar() {
 
               {isLoggedIn ? (
                 <>
-                  <ActionButton href="/habits/new" bg="#7283ff" color="white">
+                  <ActionButton href="/habits" bg="#7283ff" color="white">
                     + Add Habit
                   </ActionButton>
                   <motion.button
@@ -172,7 +172,7 @@ export default function Navbar() {
                 {isLoggedIn ? (
                   <>
                     <MobileActionButton
-                      href="/habits/new"
+                      href="/habits"
                       bg="#7283ff"
                       color="white"
                       onClick={() => setIsMenuOpen(false)}
