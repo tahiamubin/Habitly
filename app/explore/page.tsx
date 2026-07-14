@@ -1,11 +1,13 @@
 import { guides } from "@/data/guides";
 import ExploreCard from "../components/ExploreCrad";
 import Link from "next/link";
-import SortControls from "../components/SortControls";
+
+
+
+import { Suspense } from "react";
 import SearchBar from "../components/SearchBar ";
 import CategoryFilter from "../components/CategoryFilter";
-import Loader from "@/components/Loader";
-import { Suspense } from "react";
+import SortControls from "../components/SortControls";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -131,7 +133,7 @@ export default async function ExplorePage({ searchParams }: PageProps) {
         )}
 
         {/* Sort controls */}
-        <SortControls sortBy={sortBy} order={order} searchQuery={searchQuery} />
+       <SortControls sortBy={sortBy} order={order} />
 
         {/* Guides Grid */}
         {paginatedGuides.length === 0 ? (

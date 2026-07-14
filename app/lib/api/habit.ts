@@ -1,9 +1,10 @@
-interface Habit {
+export interface Habit {
   _id: string;
   category: string;
   description: string;
   name: string;
   target: string;
+  frequency: "daily" | "weekly" | "monthly";
   createdAt: string;
 }
 

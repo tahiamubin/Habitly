@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Habit } from "../lib/api/habit";
 import {
   FaEye,
   FaTrash,
@@ -16,18 +17,7 @@ import {
 import { deleteHabit } from "../lib/actions/habits";
 import toast from "react-hot-toast";
 
-interface Habit {
-  _id: string;
-  name: string;
-  description?: string;
-  frequency: "daily" | "weekly" | "monthly";
-  target?: string;
-  category?: string;
-  streak: number;
-  completed: boolean;
-  createdAt: string;
-  history?: string[];
-}
+
 
 interface HabitsListProps {
   habits: Habit[];
@@ -125,12 +115,12 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
                   Target
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                {/* <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
                   Streak
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                </th> */}
+                {/* <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
                   Status
-                </th>
+                </th> */}
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
                   Created
                 </th>
@@ -176,7 +166,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                       {habit.target || "—"}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5">
                       <FaFire
                         className="w-4 h-4"
@@ -201,7 +191,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                         Pending
                       </span>
                     )}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5">
                       <FaCalendarAlt className="w-3 h-3 text-gray-400" />
@@ -276,7 +266,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   <FaFire
                     className="w-4 h-4"
@@ -295,7 +285,7 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                     <FaClock className="w-3 h-3" /> Pending
                   </span>
                 )}
-              </div>
+              </div> */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleView(habit)}
@@ -425,19 +415,19 @@ const ViewModal = ({
               <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
                 Streak
               </h4>
-              <p className="text-gray-700 flex items-center gap-1.5">
+              {/* <p className="text-gray-700 flex items-center gap-1.5">
                 <FaFire
                   className="w-4 h-4"
                   style={{ color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db" }}
                 />
                 {habit.streak} days
-              </p>
+              </p> */}
             </div>
             <div>
               <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
                 Status
               </h4>
-              <p className="text-gray-700">
+              {/* <p className="text-gray-700">
                 {habit.completed ? (
                   <span className="text-green-600 flex items-center gap-1">
                     <FaCheckCircle className="w-4 h-4" /> Completed
@@ -447,7 +437,7 @@ const ViewModal = ({
                     <FaClock className="w-4 h-4" /> Pending
                   </span>
                 )}
-              </p>
+              </p> */}
             </div>
             <div>
               <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
@@ -460,7 +450,7 @@ const ViewModal = ({
           </div>
 
           {/* History */}
-          {habit.history && habit.history.length > 0 && (
+          {/* {habit.history && habit.history.length > 0 && (
             <div>
               <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 History ({habit.history.length} days)
@@ -476,7 +466,7 @@ const ViewModal = ({
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Footer */}
