@@ -1,8 +1,9 @@
 import { guides } from "@/data/guides";
 import ExploreCard from "../components/ExploreCrad";
-
 import Link from "next/link";
 import SortControls from "../components/SortControls";
+import SearchBar from "../components/SearchBar ";
+
 
 const ITEMS_PER_PAGE = 8;
 
@@ -13,7 +14,12 @@ const DIFFICULTY_ORDER: Record<string, number> = {
 };
 
 type PageProps = {
-  searchParams: Promise<{ page?: string; sortBy?: string; order?: string }>;
+  searchParams: Promise<{ 
+    page?: string; 
+    sortBy?: string; 
+    order?: string;
+    search?: string;
+  }>;
 };
 
 export default async function ExplorePage({ searchParams }: PageProps) {
@@ -22,9 +28,28 @@ export default async function ExplorePage({ searchParams }: PageProps) {
   const currentPage = Math.max(1, Number(params.page) || 1);
   const sortBy = params.sortBy === "difficulty" || params.sortBy === "rating" ? params.sortBy : "";
   const order = params.order === "asc" ? "asc" : "desc";
+  const searchQuery = params.search?.toLowerCase() || "";
 
-  // never mutate the shared imported array
-  const sortedGuides = [...guides];
+  // Filter guides based on search query
+  let filteredGuides = [...guides];
+  
+  if (searchQuery) {
+    filteredGuides = filteredGuides.filter((guide) => {
+      const searchableFields = [
+        guide.title,
+        guide.category,
+        guide.shortDescription,
+        guide.fullDescription,
+        guide.difficulty,
+        ...guide.steps
+      ].map(field => field.toLowerCase());
+      
+      return searchableFields.some(field => field.includes(searchQuery));
+    });
+  }
+
+  // Sort guides
+  const sortedGuides = filteredGuides;
 
   if (sortBy === "rating") {
     sortedGuides.sort((a, b) => (order === "asc" ? a.rating - b.rating : b.rating - a.rating));
@@ -46,62 +71,129 @@ export default async function ExplorePage({ searchParams }: PageProps) {
       qs.set("sortBy", sortBy);
       qs.set("order", order);
     }
+    if (searchQuery) {
+      qs.set("search", searchQuery);
+    }
     return `/explore?${qs.toString()}`;
   };
 
   return (
-    <div className="container mx-auto px-4">
-      {/* Sort controls (client component so the <select> can trigger navigation) */}
-      <SortControls sortBy={sortBy} order={order} />
+    <div className="container mx-auto px-4 py-8">
+      {/* Search Bar - Client Component */}
+      <SearchBar
+        searchQuery={searchQuery} 
+        sortBy={sortBy} 
+        order={order} 
+      />
 
-      <div className="gap-4 grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 mt-4">
-        {paginatedGuides.map((guide) => (
-          <ExploreCard key={guide.id} guide={guide} />
-        ))}
-      </div>
+      {/* Search Results Info */}
+      {searchQuery && (
+        <p className="text-sm text-gray-500 mt-2">
+          Found {sortedGuides.length} result{sortedGuides.length !== 1 ? 's' : ''} for "{searchQuery}"
+        </p>
+      )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
-          {currentPage === 1 ? (
-            <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400">
-              Previous
-            </span>
-          ) : (
+      {/* Sort controls */}
+      <SortControls sortBy={sortBy} order={order} searchQuery={searchQuery} />
+
+      {/* Guides Grid */}
+      {paginatedGuides.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 mt-4">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-semibold text-black mb-2">No guides found</h3>
+          <p className="text-gray-600">
+            {searchQuery 
+              ? `No results found for "${searchQuery}". Try a different search term.`
+              : "No guides available at the moment."}
+          </p>
+          {searchQuery && (
             <Link
-              href={pageHref(currentPage - 1)}
-              className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
+              href={pageHref(1)}
+              className="inline-block mt-4 px-6 py-2 rounded-xl font-medium text-white transition-all hover:opacity-90"
+              style={{ backgroundColor: "#7283ff" }}
             >
-              Previous
+              Clear Search
             </Link>
           )}
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Link
-              key={page}
-              href={pageHref(page)}
-              className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all ${
-                page === currentPage
-                  ? "text-white"
-                  : "bg-white border border-gray-200 hover:bg-gray-50 text-black"
-              }`}
-              style={page === currentPage ? { backgroundColor: "#7283ff" } : {}}
-            >
-              {page}
-            </Link>
+        </div>
+      ) : (
+        <div className="gap-4 grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 mt-4">
+          {paginatedGuides.map((guide) => (
+            <ExploreCard key={guide.id} guide={guide} />
           ))}
+        </div>
+      )}
 
-          {currentPage === totalPages ? (
-            <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400">
-              Next
-            </span>
-          ) : (
-            <Link
-              href={pageHref(currentPage + 1)}
-              className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
-            >
-              Next
-            </Link>
-          )}
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+          <div className="flex items-center gap-2">
+            {currentPage === 1 ? (
+              <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400 cursor-not-allowed">
+                Previous
+              </span>
+            ) : (
+              <Link
+                href={pageHref(currentPage - 1)}
+                className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
+              >
+                Previous
+              </Link>
+            )}
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+              if (
+                page === 1 ||
+                page === totalPages ||
+                Math.abs(page - currentPage) <= 1
+              ) {
+                return (
+                  <Link
+                    key={page}
+                    href={pageHref(page)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all ${
+                      page === currentPage
+                        ? "text-white shadow-md"
+                        : "bg-white border border-gray-200 hover:bg-gray-50 text-black"
+                    }`}
+                    style={page === currentPage ? { backgroundColor: "#7283ff" } : {}}
+                  >
+                    {page}
+                  </Link>
+                );
+              }
+
+              if (
+                (page === 2 && currentPage > 3) ||
+                (page === totalPages - 1 && currentPage < totalPages - 2)
+              ) {
+                return (
+                  <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">
+                    …
+                  </span>
+                );
+              }
+
+              return null;
+            })}
+
+            {currentPage === totalPages ? (
+              <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400 cursor-not-allowed">
+                Next
+              </span>
+            ) : (
+              <Link
+                href={pageHref(currentPage + 1)}
+                className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
+              >
+                Next
+              </Link>
+            )}
+          </div>
+
+          <span className="text-sm text-gray-500">
+            Page {currentPage} of {totalPages}
+          </span>
         </div>
       )}
     </div>
