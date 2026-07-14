@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  FaEye, 
-  FaTrash, 
-  FaFire, 
+import {
+  FaEye,
+  FaTrash,
+  FaFire,
   FaCalendarAlt,
   FaTimes,
   FaCheckCircle,
   FaClock,
-  FaPlus
+  FaPlus,
 } from "react-icons/fa";
 import { deleteHabit } from "../lib/actions/habits";
 import toast from "react-hot-toast";
@@ -43,22 +43,25 @@ const HabitsList = ({ habits }: HabitsListProps) => {
     setSelectedHabit(habit);
   };
 
-  const handleDelete = async(id: string) => {
-    
-   await deleteHabit(id)
-   toast.success("Deleted")
+  const handleDelete = async (id: string) => {
+    await deleteHabit(id);
+    toast.success("Deleted");
   };
 
   const confirmDelete = () => {
     if (!deleteId) return;
-    
+
     setIsDeleting(true);
-    
+
     setTimeout(() => {
-      const existingHabits = JSON.parse(localStorage.getItem("habitly_habits") || "[]");
-      const updatedHabits = existingHabits.filter((h: Habit) => h.id !== deleteId);
+      const existingHabits = JSON.parse(
+        localStorage.getItem("habitly_habits") || "[]",
+      );
+      const updatedHabits = existingHabits.filter(
+        (h: Habit) => String(h._id) !== deleteId,
+      );
       localStorage.setItem("habitly_habits", JSON.stringify(updatedHabits));
-      
+
       setIsDeleting(false);
       setDeleteId(null);
       router.refresh();
@@ -72,21 +75,21 @@ const HabitsList = ({ habits }: HabitsListProps) => {
   const frequencyColor = {
     daily: "#b6ffde",
     weekly: "#7283ff",
-    monthly: "#ff6b6b"
+    monthly: "#ff6b6b",
   };
 
   const frequencyLabel = {
     daily: "Daily",
     weekly: "Weekly",
-    monthly: "Monthly"
+    monthly: "Monthly",
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -110,48 +113,80 @@ const HabitsList = ({ habits }: HabitsListProps) => {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Habit</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Category</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Frequency</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Target</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Streak</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Created</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Habit
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Category
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Frequency
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Target
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Streak
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  Created
+                </th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {habits.map((habit) => (
-                <tr key={habit._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <tr
+                  key={habit._id}
+                  className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
+                >
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-medium text-black">{habit.name}</p>
                       {habit.description && (
-                        <p className="text-sm text-gray-500 truncate max-w-xs">{habit.description}</p>
+                        <p className="text-sm text-gray-500 truncate max-w-xs">
+                          {habit.description}
+                        </p>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-600">{habit.category || "—"}</span>
+                    <span className="text-sm text-gray-600">
+                      {habit.category || "—"}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span 
+                    <span
                       className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                      style={{ 
+                      style={{
                         backgroundColor: frequencyColor[habit.frequency],
-                        color: habit.frequency === "daily" ? "black" : "white"
+                        color: habit.frequency === "daily" ? "black" : "white",
                       }}
                     >
                       {frequencyLabel[habit.frequency]}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-600">{habit.target || "—"}</span>
+                    <span className="text-sm text-gray-600">
+                      {habit.target || "—"}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5">
-                      <FaFire className="w-4 h-4" style={{ color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db" }} />
-                      <span className="font-medium text-black">{habit.streak}d</span>
+                      <FaFire
+                        className="w-4 h-4"
+                        style={{
+                          color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db",
+                        }}
+                      />
+                      <span className="font-medium text-black">
+                        {habit.streak}d
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -170,7 +205,9 @@ const HabitsList = ({ habits }: HabitsListProps) => {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5">
                       <FaCalendarAlt className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-500">{formatDate(habit.createdAt)}</span>
+                      <span className="text-sm text-gray-500">
+                        {formatDate(habit.createdAt)}
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -201,12 +238,17 @@ const HabitsList = ({ habits }: HabitsListProps) => {
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {habits.map((habit) => (
-          <div key={habit._id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          <div
+            key={habit._id}
+            className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm"
+          >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
                 <h3 className="font-bold text-black">{habit.name}</h3>
                 {habit.description && (
-                  <p className="text-sm text-gray-500 mt-0.5">{habit.description}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {habit.description}
+                  </p>
                 )}
               </div>
               <div className="flex items-center gap-1.5 text-xs text-gray-400">
@@ -216,11 +258,11 @@ const HabitsList = ({ habits }: HabitsListProps) => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span 
+              <span
                 className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                style={{ 
+                style={{
                   backgroundColor: frequencyColor[habit.frequency],
-                  color: habit.frequency === "daily" ? "black" : "white"
+                  color: habit.frequency === "daily" ? "black" : "white",
                 }}
               >
                 {frequencyLabel[habit.frequency]}
@@ -236,8 +278,13 @@ const HabitsList = ({ habits }: HabitsListProps) => {
             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <FaFire className="w-4 h-4" style={{ color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db" }} />
-                  <span className="font-medium text-black">{habit.streak}d</span>
+                  <FaFire
+                    className="w-4 h-4"
+                    style={{ color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db" }}
+                  />
+                  <span className="font-medium text-black">
+                    {habit.streak}d
+                  </span>
                 </div>
                 {habit.completed ? (
                   <span className="text-xs text-green-600 flex items-center gap-1">
@@ -270,13 +317,16 @@ const HabitsList = ({ habits }: HabitsListProps) => {
 
       {/* View Modal */}
       {selectedHabit && (
-        <ViewModal habit={selectedHabit} onClose={() => setSelectedHabit(null)} />
+        <ViewModal
+          habit={selectedHabit}
+          onClose={() => setSelectedHabit(null)}
+        />
       )}
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <DeleteModal 
-          onConfirm={confirmDelete} 
+        <DeleteModal
+          onConfirm={confirmDelete}
           onCancel={cancelDelete}
           isDeleting={isDeleting}
         />
@@ -286,27 +336,33 @@ const HabitsList = ({ habits }: HabitsListProps) => {
 };
 
 // View Modal Component
-const ViewModal = ({ habit, onClose }: { habit: Habit; onClose: () => void }) => {
+const ViewModal = ({
+  habit,
+  onClose,
+}: {
+  habit: Habit;
+  onClose: () => void;
+}) => {
   const frequencyLabel = {
     daily: "Daily",
     weekly: "Weekly",
-    monthly: "Monthly"
+    monthly: "Monthly",
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -319,7 +375,10 @@ const ViewModal = ({ habit, onClose }: { habit: Habit; onClose: () => void }) =>
             <h2 className="text-2xl font-bold text-black">{habit.name}</h2>
             <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
               <FaCalendarAlt className="w-3 h-3" />
-              <span>Created: {formatDate(habit.createdAt)} at {formatTime(habit.createdAt)}</span>
+              <span>
+                Created: {formatDate(habit.createdAt)} at{" "}
+                {formatTime(habit.createdAt)}
+              </span>
             </div>
           </div>
           <button
@@ -367,7 +426,10 @@ const ViewModal = ({ habit, onClose }: { habit: Habit; onClose: () => void }) =>
                 Streak
               </h4>
               <p className="text-gray-700 flex items-center gap-1.5">
-                <FaFire className="w-4 h-4" style={{ color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db" }} />
+                <FaFire
+                  className="w-4 h-4"
+                  style={{ color: habit.streak > 0 ? "#ff6b6b" : "#d1d5db" }}
+                />
                 {habit.streak} days
               </p>
             </div>
@@ -391,7 +453,9 @@ const ViewModal = ({ habit, onClose }: { habit: Habit; onClose: () => void }) =>
               <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
                 ID
               </h4>
-              <p className="text-gray-700 text-xs font-mono truncate">{habit.id}</p>
+              <p className="text-gray-700 text-xs font-mono truncate">
+                {String(habit._id)}
+              </p>
             </div>
           </div>
 
@@ -431,13 +495,13 @@ const ViewModal = ({ habit, onClose }: { habit: Habit; onClose: () => void }) =>
 };
 
 // Delete Modal Component
-const DeleteModal = ({ 
-  onConfirm, 
-  onCancel, 
-  isDeleting 
-}: { 
-  onConfirm: () => void; 
-  onCancel: () => void; 
+const DeleteModal = ({
+  onConfirm,
+  onCancel,
+  isDeleting,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
   isDeleting: boolean;
 }) => {
   return (
@@ -449,7 +513,8 @@ const DeleteModal = ({
           </div>
           <h3 className="text-xl font-bold text-black mb-2">Delete Habit</h3>
           <p className="text-gray-600 mb-6">
-            Are you sure you want to delete this habit? This action cannot be undone.
+            Are you sure you want to delete this habit? This action cannot be
+            undone.
           </p>
           <div className="flex gap-3">
             <button
