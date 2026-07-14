@@ -4,7 +4,8 @@ import Link from "next/link";
 import SortControls from "../components/SortControls";
 import SearchBar from "../components/SearchBar ";
 import CategoryFilter from "../components/CategoryFilter";
-
+import Loader from "@/components/Loader";
+import { Suspense } from "react";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -20,7 +21,7 @@ type PageProps = {
     sortBy?: string; 
     order?: string;
     search?: string;
-    category?: string; // Add this
+    category?: string;
   }>;
 };
 
@@ -31,19 +32,17 @@ export default async function ExplorePage({ searchParams }: PageProps) {
   const sortBy = params.sortBy === "difficulty" || params.sortBy === "rating" ? params.sortBy : "";
   const order = params.order === "asc" ? "asc" : "desc";
   const searchQuery = params.search?.toLowerCase() || "";
-  const selectedCategory = params.category || ""; // Add this
+  const selectedCategory = params.category || "";
 
   // Filter guides based on search query and category
   let filteredGuides = [...guides];
   
-  // Apply category filter - ADD THIS
   if (selectedCategory) {
     filteredGuides = filteredGuides.filter(
       (guide) => guide.category === selectedCategory
     );
   }
   
-  // Apply search filter
   if (searchQuery) {
     filteredGuides = filteredGuides.filter((guide) => {
       const searchableFields = [
@@ -85,141 +84,156 @@ export default async function ExplorePage({ searchParams }: PageProps) {
     if (searchQuery) {
       qs.set("search", searchQuery);
     }
-    if (selectedCategory) { // Add this
+    if (selectedCategory) {
       qs.set("category", selectedCategory);
     }
     return `/explore?${qs.toString()}`;
   };
 
+  // Loading fallback component
+  const LoadingFallback = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+      <div className="flex flex-col items-center justify-center gap-3">
+        <div 
+          className="w-10 h-10 rounded-full border-3 border-t-transparent animate-spin"
+          style={{ borderColor: "#7283ff", borderTopColor: "transparent" }}
+        />
+        <p className="text-sm text-gray-500">Loading guides...</p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Search Bar */}
-      <SearchBar
-        searchQuery={searchQuery} 
-        sortBy={sortBy} 
-        order={order} 
-      />
+    <Suspense fallback={<LoadingFallback />}>
+      <div className="container mx-auto px-4 py-8">
+        {/* Search Bar */}
+        <SearchBar
+          searchQuery={searchQuery} 
+          sortBy={sortBy} 
+          order={order} 
+        />
 
-      {/* Category Filter - ADD THIS */}
-      <CategoryFilter 
-        selectedCategory={selectedCategory}
-        searchQuery={searchQuery}
-        sortBy={sortBy}
-        order={order}
-      />
+        {/* Category Filter */}
+        <CategoryFilter 
+          selectedCategory={selectedCategory}
+          searchQuery={searchQuery}
+          sortBy={sortBy}
+          order={order}
+        />
 
-      {/* Search Results Info */}
-      {(searchQuery || selectedCategory) && ( // Update this
-        <p className="text-sm text-gray-500 mt-2">
-          Found {sortedGuides.length} result{sortedGuides.length !== 1 ? 's' : ''} 
-          {searchQuery && ` for "${searchQuery}"`}
-          {selectedCategory && ` in ${selectedCategory}`}
-        </p>
-      )}
-
-      {/* Sort controls */}
-      <SortControls sortBy={sortBy} order={order} searchQuery={searchQuery} />
-
-      {/* Guides Grid */}
-      {paginatedGuides.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 mt-4">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-semibold text-black mb-2">No guides found</h3>
-          <p className="text-gray-600">
-            {searchQuery || selectedCategory 
-              ? `No results found. Try adjusting your filters.`
-              : "No guides available at the moment."}
+        {/* Search Results Info */}
+        {(searchQuery || selectedCategory) && (
+          <p className="text-sm text-gray-500 mt-2">
+            Found {sortedGuides.length} result{sortedGuides.length !== 1 ? 's' : ''} 
+            {searchQuery && ` for "${searchQuery}"`}
+            {selectedCategory && ` in ${selectedCategory}`}
           </p>
-          {(searchQuery || selectedCategory) && (
-            <Link
-              href="/explore"
-              className="inline-block mt-4 px-6 py-2 rounded-xl font-medium text-white transition-all hover:opacity-90"
-              style={{ backgroundColor: "#7283ff" }}
-            >
-              Clear All Filters
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div className="gap-4 grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 mt-4">
-          {paginatedGuides.map((guide) => (
-            <ExploreCard key={guide.id} guide={guide} />
-          ))}
-        </div>
-      )}
+        )}
 
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-          <div className="flex items-center gap-2">
-            {currentPage === 1 ? (
-              <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400 cursor-not-allowed">
-                Previous
-              </span>
-            ) : (
+        {/* Sort controls */}
+        <SortControls sortBy={sortBy} order={order} searchQuery={searchQuery} />
+
+        {/* Guides Grid */}
+        {paginatedGuides.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 mt-4">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-semibold text-black mb-2">No guides found</h3>
+            <p className="text-gray-600">
+              {searchQuery || selectedCategory 
+                ? `No results found. Try adjusting your filters.`
+                : "No guides available at the moment."}
+            </p>
+            {(searchQuery || selectedCategory) && (
               <Link
-                href={pageHref(currentPage - 1)}
-                className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
+                href="/explore"
+                className="inline-block mt-4 px-6 py-2 rounded-xl font-medium text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: "#7283ff" }}
               >
-                Previous
-              </Link>
-            )}
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-              if (
-                page === 1 ||
-                page === totalPages ||
-                Math.abs(page - currentPage) <= 1
-              ) {
-                return (
-                  <Link
-                    key={page}
-                    href={pageHref(page)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all ${
-                      page === currentPage
-                        ? "text-white shadow-md"
-                        : "bg-white border border-gray-200 hover:bg-gray-50 text-black"
-                    }`}
-                    style={page === currentPage ? { backgroundColor: "#7283ff" } : {}}
-                  >
-                    {page}
-                  </Link>
-                );
-              }
-
-              if (
-                (page === 2 && currentPage > 3) ||
-                (page === totalPages - 1 && currentPage < totalPages - 2)
-              ) {
-                return (
-                  <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">
-                    …
-                  </span>
-                );
-              }
-
-              return null;
-            })}
-
-            {currentPage === totalPages ? (
-              <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400 cursor-not-allowed">
-                Next
-              </span>
-            ) : (
-              <Link
-                href={pageHref(currentPage + 1)}
-                className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
-              >
-                Next
+                Clear All Filters
               </Link>
             )}
           </div>
+        ) : (
+          <div className="gap-4 grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 mt-4">
+            {paginatedGuides.map((guide) => (
+              <ExploreCard key={guide.id} guide={guide} />
+            ))}
+          </div>
+        )}
 
-          <span className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
-          </span>
-        </div>
-      )}
-    </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+            <div className="flex items-center gap-2">
+              {currentPage === 1 ? (
+                <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400 cursor-not-allowed">
+                  Previous
+                </span>
+              ) : (
+                <Link
+                  href={pageHref(currentPage - 1)}
+                  className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
+                >
+                  Previous
+                </Link>
+              )}
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  Math.abs(page - currentPage) <= 1
+                ) {
+                  return (
+                    <Link
+                      key={page}
+                      href={pageHref(page)}
+                      className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all ${
+                        page === currentPage
+                          ? "text-white shadow-md"
+                          : "bg-white border border-gray-200 hover:bg-gray-50 text-black"
+                      }`}
+                      style={page === currentPage ? { backgroundColor: "#7283ff" } : {}}
+                    >
+                      {page}
+                    </Link>
+                  );
+                }
+
+                if (
+                  (page === 2 && currentPage > 3) ||
+                  (page === totalPages - 1 && currentPage < totalPages - 2)
+                ) {
+                  return (
+                    <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">
+                      …
+                    </span>
+                  );
+                }
+
+                return null;
+              })}
+
+              {currentPage === totalPages ? (
+                <span className="px-4 py-2 rounded-lg font-medium opacity-40 bg-gray-100 text-gray-400 cursor-not-allowed">
+                  Next
+                </span>
+              ) : (
+                <Link
+                  href={pageHref(currentPage + 1)}
+                  className="px-4 py-2 rounded-lg font-medium transition-all bg-white border border-gray-200 hover:bg-gray-50 text-black"
+                >
+                  Next
+                </Link>
+              )}
+            </div>
+
+            <span className="text-sm text-gray-500">
+              Page {currentPage} of {totalPages}
+            </span>
+          </div>
+        )}
+      </div>
+    </Suspense>
   );
 }

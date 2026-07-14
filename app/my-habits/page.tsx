@@ -19,7 +19,7 @@ const Page = async () => {
           </div>
           <div className="mt-4 sm:mt-0">
             <a
-              href="/habits/add"
+              href="/habits"
               className="inline-flex items-center px-4 py-2.5 rounded-lg font-medium text-white transition-all hover:opacity-90"
               style={{ backgroundColor: "#7283ff" }}
             >
