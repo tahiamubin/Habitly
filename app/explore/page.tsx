@@ -3,6 +3,7 @@ import ExploreCard from "../components/ExploreCrad";
 import Link from "next/link";
 import SortControls from "../components/SortControls";
 import SearchBar from "../components/SearchBar ";
+import CategoryFilter from "../components/CategoryFilter";
 
 
 const ITEMS_PER_PAGE = 8;
@@ -19,6 +20,7 @@ type PageProps = {
     sortBy?: string; 
     order?: string;
     search?: string;
+    category?: string; // Add this
   }>;
 };
 
@@ -29,10 +31,19 @@ export default async function ExplorePage({ searchParams }: PageProps) {
   const sortBy = params.sortBy === "difficulty" || params.sortBy === "rating" ? params.sortBy : "";
   const order = params.order === "asc" ? "asc" : "desc";
   const searchQuery = params.search?.toLowerCase() || "";
+  const selectedCategory = params.category || ""; // Add this
 
-  // Filter guides based on search query
+  // Filter guides based on search query and category
   let filteredGuides = [...guides];
   
+  // Apply category filter - ADD THIS
+  if (selectedCategory) {
+    filteredGuides = filteredGuides.filter(
+      (guide) => guide.category === selectedCategory
+    );
+  }
+  
+  // Apply search filter
   if (searchQuery) {
     filteredGuides = filteredGuides.filter((guide) => {
       const searchableFields = [
@@ -74,22 +85,35 @@ export default async function ExplorePage({ searchParams }: PageProps) {
     if (searchQuery) {
       qs.set("search", searchQuery);
     }
+    if (selectedCategory) { // Add this
+      qs.set("category", selectedCategory);
+    }
     return `/explore?${qs.toString()}`;
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Search Bar - Client Component */}
+      {/* Search Bar */}
       <SearchBar
         searchQuery={searchQuery} 
         sortBy={sortBy} 
         order={order} 
       />
 
+      {/* Category Filter - ADD THIS */}
+      <CategoryFilter 
+        selectedCategory={selectedCategory}
+        searchQuery={searchQuery}
+        sortBy={sortBy}
+        order={order}
+      />
+
       {/* Search Results Info */}
-      {searchQuery && (
+      {(searchQuery || selectedCategory) && ( // Update this
         <p className="text-sm text-gray-500 mt-2">
-          Found {sortedGuides.length} result{sortedGuides.length !== 1 ? 's' : ''} for "{searchQuery}"
+          Found {sortedGuides.length} result{sortedGuides.length !== 1 ? 's' : ''} 
+          {searchQuery && ` for "${searchQuery}"`}
+          {selectedCategory && ` in ${selectedCategory}`}
         </p>
       )}
 
@@ -102,17 +126,17 @@ export default async function ExplorePage({ searchParams }: PageProps) {
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-xl font-semibold text-black mb-2">No guides found</h3>
           <p className="text-gray-600">
-            {searchQuery 
-              ? `No results found for "${searchQuery}". Try a different search term.`
+            {searchQuery || selectedCategory 
+              ? `No results found. Try adjusting your filters.`
               : "No guides available at the moment."}
           </p>
-          {searchQuery && (
+          {(searchQuery || selectedCategory) && (
             <Link
-              href={pageHref(1)}
+              href="/explore"
               className="inline-block mt-4 px-6 py-2 rounded-xl font-medium text-white transition-all hover:opacity-90"
               style={{ backgroundColor: "#7283ff" }}
             >
-              Clear Search
+              Clear All Filters
             </Link>
           )}
         </div>

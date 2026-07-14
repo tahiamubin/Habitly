@@ -46,7 +46,7 @@ const Footer = () => {
               <FooterLink href="/">Home</FooterLink>
               <FooterLink href="/explore">Explore Guides</FooterLink>
               <FooterLink href="/about">About Us</FooterLink>
-              <FooterLink href="/blog">Blog</FooterLink>
+              {/* <FooterLink href="/blog">Blog</FooterLink> */}
             </ul>
           </div>
 
@@ -59,7 +59,7 @@ const Footer = () => {
               <FooterLink href="/habits">Habit Tracker</FooterLink>
               <FooterLink href="/explore?category=routines">Routines</FooterLink>
               <FooterLink href="/explore?category=challenges">Challenges</FooterLink>
-              <FooterLink href="/saved-guides">Saved Guides</FooterLink>
+              {/* <FooterLink href="/saved-guides">Saved Guides</FooterLink> */}
             </ul>
           </div>
 
