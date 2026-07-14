@@ -17,7 +17,7 @@ import { deleteHabit } from "../lib/actions/habits";
 import toast from "react-hot-toast";
 
 interface Habit {
-  _id: object;
+  _id: string;
   name: string;
   description?: string;
   frequency: "daily" | "weekly" | "monthly";
