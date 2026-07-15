@@ -14,7 +14,7 @@ interface HabitResponse extends Habit {
 
 export const creteHabit = async (data: Habit): Promise<HabitResponse> => {
   const token = await getToken();
-  console.log("got token:", token);
+  //console.log("got token:", token);
   const res = await fetch(`${baseUrl}/habit`, {
     method: "POST",
     headers: {
